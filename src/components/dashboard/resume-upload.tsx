@@ -32,7 +32,9 @@ export function ResumeUpload() {
         
         <UploadDropzone
           endpoint="resumeUploader"
-          onClientUploadComplete={async (res) => {
+         onClientUploadComplete={async (
+  res: { url: string; name: string; type: string }[]
+) => {
             if (!res || res.length === 0) return;
             const file = res[0];
             
