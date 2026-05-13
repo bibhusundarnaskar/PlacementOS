@@ -1,36 +1,123 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PlacementOS
+
+Production-grade full-stack AI career assistant built with Next.js 15 App Router, TypeScript, Tailwind CSS, shadcn/ui conventions, PostgreSQL, Prisma, Clerk Auth, Google Gemini, and REST API routes.
+
+## Features
+
+- Resume upload and parsing for PDF, DOCX, and TXT files
+- ATS resume scoring with AI-backed suggestions
+- Company-specific interview question generation
+- Authenticated student dashboard
+- Progress tracking API and dashboard views
+- Dark mode with `next-themes`
+- Responsive Linear/Notion-inspired UI
+- Dockerized PostgreSQL and standalone Next.js production image
+
+## Tech Stack
+
+- `next@15` App Router
+- TypeScript
+- Tailwind CSS v4
+- shadcn/ui-style primitives in `src/components/ui`
+- Prisma + PostgreSQL
+- Clerk Auth
+- Google Gemini SDK
+- REST API architecture under `src/app/api`
 
 ## Getting Started
 
-First, run the development server:
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Copy environment variables:
+
+```bash
+cp .env.example .env
+```
+
+3. Start PostgreSQL:
+
+```bash
+docker compose up -d
+```
+
+4. Generate Prisma client and push schema:
+
+```bash
+npm run db:generate
+npm run db:push
+```
+
+5. Start the dev server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Required:
 
-## Learn More
+- `DATABASE_URL`
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
+- `CLERK_SECRET_KEY`
 
-To learn more about Next.js, take a look at the following resources:
+Optional:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `GEMINI_API_KEY`
+- `GEMINI_MODEL`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+When `GEMINI_API_KEY` is not set, PlacementOS uses deterministic fallback logic for ATS scoring and interview question generation so local development still works.
 
-## Deploy on Vercel
+## Project Structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```text
+src/app                 App Router pages and REST API routes
+src/app/api             Authenticated REST endpoints
+src/components/ui       Reusable shadcn-style UI primitives
+src/components/dashboard Dashboard feature components
+src/components/providers Global providers
+src/lib/ai              Gemini services and structured AI helpers
+src/lib/resume          Resume parsing utilities
+src/lib/validations     Zod request schemas
+src/lib/prisma.ts       Prisma singleton
+prisma/schema.prisma    PostgreSQL schema
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## API Routes
+
+- `GET /api/resumes`
+- `POST /api/resumes`
+- `POST /api/ats-score`
+- `POST /api/interview-questions`
+- `GET /api/progress`
+- `POST /api/progress`
+
+All API routes are protected by Clerk middleware.
+
+## Production
+
+Build locally:
+
+```bash
+npm run build
+npm run start
+```
+
+Build container:
+
+```bash
+docker build -t placementos .
+docker run --env-file .env -p 3000:3000 placementos
+```
+
+## Notes
+
+- Keep uploaded file sizes small. The default parser limit is 5MB.
+- Run `npm run lint` and `npm run build` before opening a pull request.
+- Use Prisma migrations for shared environments: `npm run db:migrate`.
