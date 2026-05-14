@@ -1,7 +1,10 @@
+import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
+import { Upload } from "lucide-react";
 import { getCurrentStudent } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
@@ -32,11 +35,19 @@ export default async function DashboardPage() {
 
   return (
     <div className="grid gap-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-normal">Student dashboard</h1>
-        <p className="text-sm text-muted-foreground">
-          Resume readiness, interview preparation, and placement execution.
-        </p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-normal">Student dashboard</h1>
+          <p className="text-sm text-muted-foreground">
+            Resume readiness, interview preparation, and placement execution.
+          </p>
+        </div>
+        <Button asChild>
+          <Link href="/dashboard/resumes">
+            <Upload className="mr-2 size-4" />
+            Upload Resume
+          </Link>
+        </Button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -73,17 +84,24 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent className="grid gap-3">
             {resumes.length ? resumes.map((resume) => (
-              <div key={resume.id} className="rounded-md border p-3">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="truncate text-sm font-medium">{resume.fileName}</p>
-                  <Badge variant="secondary">{resume.atsScore || 0}/100</Badge>
+              <Link key={resume.id} href={`/dashboard/resumes/${resume.id}`} className="block transition-transform hover:scale-[1.01]">
+                <div className="rounded-md border p-3 hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="truncate text-sm font-medium">{resume.fileName}</p>
+                    <Badge variant="secondary">{resume.atsScore || 0}/100</Badge>
+                  </div>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {formatDistanceToNow(resume.createdAt, { addSuffix: true })}
+                  </p>
                 </div>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {formatDistanceToNow(resume.createdAt, { addSuffix: true })}
-                </p>
-              </div>
+              </Link>
             )) : (
-              <p className="text-sm text-muted-foreground">No resumes uploaded yet.</p>
+              <div className="flex flex-col items-center gap-2 py-4 text-center">
+                <p className="text-sm text-muted-foreground">No resumes uploaded yet.</p>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/dashboard/resumes">Upload your first resume</Link>
+                </Button>
+              </div>
             )}
           </CardContent>
         </Card>
@@ -94,17 +112,24 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent className="grid gap-3">
             {progressItems.length ? progressItems.map((item) => (
-              <div key={item.id} className="rounded-md border p-3">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-medium">{item.title}</p>
-                  <Badge variant={item.status === "DONE" ? "success" : "outline"}>
-                    {item.status.replace("_", " ")}
-                  </Badge>
+              <Link key={item.id} href="/dashboard/progress" className="block transition-transform hover:scale-[1.01]">
+                <div className="rounded-md border p-3 hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm font-medium">{item.title}</p>
+                    <Badge variant={item.status === "DONE" ? "success" : "outline"}>
+                      {item.status.replace("_", " ")}
+                    </Badge>
+                  </div>
+                  <p className="mt-1 text-xs text-muted-foreground">{item.category}</p>
                 </div>
-                <p className="mt-1 text-xs text-muted-foreground">{item.category}</p>
-              </div>
+              </Link>
             )) : (
-              <p className="text-sm text-muted-foreground">No progress items yet.</p>
+              <div className="flex flex-col items-center gap-2 py-4 text-center">
+                <p className="text-sm text-muted-foreground">No progress items yet.</p>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/dashboard/progress">Create action plan</Link>
+                </Button>
+              </div>
             )}
           </CardContent>
         </Card>

@@ -91,7 +91,7 @@ export default async function Home() {
               <p className="text-xs text-muted-foreground">Live student workspace</p>
             </div>
             <span className="rounded-md bg-emerald-500/10 px-2 py-1 text-xs text-emerald-700 dark:text-emerald-300">
-              72% ready
+              Active Workspace
             </span>
           </div>
           <div className="grid gap-3">
